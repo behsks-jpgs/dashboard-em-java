@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thindesk · Painel administrativo</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232a78d6'/><path d='M9 11h14M16 11v12' stroke='white' stroke-width='3.5' stroke-linecap='round'/></svg>">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="marca">
+    <span class="logo" aria-hidden="true">T</span>
+    <div>
+      <strong>Thindesk</strong>
+      <span class="sub">Painel administrativo de chamados</span>
+    </div>
+  </div>
+  <div class="atualizacao">
+    <span id="status-conexao" class="conexao" aria-live="polite">Conectando…</span>
+    <label class="switch" title="Atualiza os dados a cada 30 segundos">
+      <input type="checkbox" id="auto-refresh" checked>
+      <span>Atualização automática</span>
+    </label>
+    <button id="btn-atualizar" class="btn">Atualizar agora</button>
+  </div>
+</header>
+
+<main>
+  <!-- RF05 — Filtros de consulta -->
+  <section class="filtros" aria-label="Filtros">
+    <div class="campo">
+      <label for="f-periodo">Período</label>
+      <select id="f-periodo">
+        <option value="7">Últimos 7 dias</option>
+        <option value="30" selected>Últimos 30 dias</option>
+        <option value="90">Últimos 90 dias</option>
+        <option value="365">Últimos 12 meses</option>
+        <option value="custom">Personalizado…</option>
+      </select>
+    </div>
+    <div class="campo personalizado" hidden>
+      <label for="f-inicio">De</label>
+      <input type="date" id="f-inicio">
+    </div>
+    <div class="campo personalizado" hidden>
+      <label for="f-fim">Até</label>
+      <input type="date" id="f-fim">
+    </div>
+    <div class="campo">
+      <label>Status</label>
+      <details class="multi" id="f-status">
+        <summary>Todos</summary>
+        <div class="opcoes"></div>
+      </details>
+    </div>
+    <div class="campo">
+      <label for="f-prioridade">Prioridade</label>
+      <select id="f-prioridade"><option value="">Todas</option></select>
+    </div>
+    <div class="campo">
+      <label for="f-categoria">Tipo de chamado</label>
+      <select id="f-categoria"><option value="">Todos</option></select>
+    </div>
+    <div class="campo">
+      <label for="f-tecnico">Técnico</label>
+      <select id="f-tecnico"><option value="">Todos</option></select>
+    </div>
+    <button id="btn-limpar" class="btn ghost">Limpar filtros</button>
+  </section>
+
+  <div id="erro-global" class="alerta" hidden>
+    <span id="erro-texto"></span>
+    <button class="btn" id="btn-tentar">Tentar novamente</button>
+  </div>
+
+  <!-- RF01 — Indicadores gerais -->
+  <section class="kpis" id="kpis" aria-label="Indicadores gerais"></section>
+  <p class="nota-comparativo" id="nota-comparativo"></p>
+
+  <div class="grade">
+    <!-- RF02 — Chamados por período -->
+    <article class="card largo">
+      <header class="card-cab">
+        <div>
+          <h2>Chamados abertos × resolvidos</h2>
+          <p class="desc">Abertos pela data de abertura; resolvidos pela data de resolução.</p>
+        </div>
+        <div class="segmentado" role="group" aria-label="Agrupamento">
+          <button data-agrup="dia" class="ativo">Dia</button>
+          <button data-agrup="semana">Semana</button>
+          <button data-agrup="mes">Mês</button>
+        </div>
+      </header>
+      <div id="grafico-serie" class="grafico" style="height:280px"></div>
+    </article>
+
+    <!-- RF03 — Situação -->
+    <article class="card">
+      <header class="card-cab">
+        <div>
+          <h2>Situação dos chamados</h2>
+          <p class="desc">Distribuição por status no período.</p>
+        </div>
+      </header>
+      <div id="grafico-status" class="grafico"></div>
+      <div id="alerta-atrasados" class="atrasados"></div>
+    </article>
+
+    <!-- RF04 — Tipos mais atendidos -->
+    <article class="card">
+      <header class="card-cab">
+        <div>
+          <h2>Tipos de chamado mais atendidos</h2>
+          <p class="desc">Ranking por chamados que receberam atendimento.</p>
+        </div>
+      </header>
+      <div id="grafico-tipos" class="grafico"></div>
+    </article>
+
+    <article class="card">
+      <header class="card-cab">
+        <div>
+          <h2>Pendentes por prioridade</h2>
+          <p class="desc">Fila atual e quantos já estouraram o SLA.</p>
+        </div>
+      </header>
+      <div id="grafico-prioridade" class="grafico"></div>
+    </article>
+
+    <article class="card">
+      <header class="card-cab">
+        <div>
+          <h2>Idade dos pendentes</h2>
+          <p class="desc">Há quanto tempo os chamados em aberto esperam.</p>
+        </div>
+      </header>
+      <div id="grafico-idade" class="grafico"></div>
+    </article>
+
+    <article class="card largo">
+      <header class="card-cab">
+        <div>
+          <h2>Desempenho por técnico</h2>
+          <p class="desc">Carga, resolução e cumprimento de SLA no período.</p>
+        </div>
+      </header>
+      <div class="tabela-wrap"><table class="tabela" id="tabela-tecnicos"></table></div>
+    </article>
+
+    <!-- Lista de chamados -->
+    <article class="card largo">
+      <header class="card-cab">
+        <div>
+          <h2>Chamados</h2>
+          <p class="desc">Clique em um chamado para ver as considerações técnicas e atualizar o status.</p>
+        </div>
+        <div class="acoes-lista">
+          <input type="search" id="busca" placeholder="Buscar por título, solicitante ou setor">
+          <label class="switch"><input type="checkbox" id="so-atrasados"><span>Só atrasados</span></label>
+          <button class="btn" id="btn-novo">+ Novo chamado</button>
+        </div>
+      </header>
+      <div class="tabela-wrap"><table class="tabela clicavel" id="tabela-chamados"></table></div>
+      <div class="paginacao" id="paginacao"></div>
+    </article>
+  </div>
+</main>
+
+<!-- Painel lateral de detalhes -->
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-fundo" data-fechar></div>
+  <div class="drawer-painel" role="dialog" aria-labelledby="drawer-titulo">
+    <button class="fechar" data-fechar aria-label="Fechar">×</button>
+    <div id="drawer-conteudo"></div>
+  </div>
+</aside>
+
+<!-- Modal: novo chamado -->
+<dialog id="modal-novo">
+  <form id="form-novo" method="dialog">
+    <h2>Novo chamado</h2>
+    <label>Título<input name="titulo" required maxlength="120"></label>
+    <label>Descrição<textarea name="descricao" required rows="3"></textarea></label>
+    <div class="linha">
+      <label>Solicitante<input name="solicitante" required></label>
+      <label>Setor<input name="setor" required></label>
+    </div>
+    <div class="linha">
+      <label>Tipo<select name="categoriaId" id="novo-categoria"></select></label>
+      <label>Prioridade<select name="prioridade" id="novo-prioridade"></select></label>
+    </div>
+    <p class="erro-form" id="erro-novo"></p>
+    <div class="botoes">
+      <button type="button" class="btn ghost" id="cancelar-novo">Cancelar</button>
+      <button type="submit" class="btn primario">Abrir chamado</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="tooltip" class="tooltip" role="tooltip" hidden></div>
+<div id="toast" class="toast" hidden></div>
+
+<script src="js/api.js"></script>
+<script src="js/graficos.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
