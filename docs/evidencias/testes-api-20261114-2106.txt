@@ -1,0 +1,91 @@
+Testes da API Thindesk - 14/11/2026 21:06 - http://localhost:8080/api/v1
+-------------------------------------------------------------------------------
+[FALHOU] Health check (API + banco)                                 esperado 200, obtido 000
+      GET /health
+      
+[FALHOU] Opções de filtros                                        esperado 200, obtido 000
+      GET /filtros
+      
+[FALHOU] RF01 indicadores últimos 30 dias                          esperado 200, obtido 000
+      GET /dashboard/indicadores?dataInicio=2026-10-16&dataFim=2026-11-14
+      
+[FALHOU] RF01 data inválida -> 400                                 esperado 400, obtido 000
+      GET /dashboard/indicadores?dataInicio=2026-13-40
+      
+[FALHOU] RF01 período invertido -> 400                             esperado 400, obtido 000
+      GET /dashboard/indicadores?dataInicio=2026-11-14&dataFim=2026-10-16
+      
+[FALHOU] RF02 série por dia                                        esperado 200, obtido 000
+      GET /dashboard/chamados-por-periodo?agrupamento=dia&dataInicio=2026-10-16&dataFim=2026-11-14
+      
+[FALHOU] RF02 série por mês                                       esperado 200, obtido 000
+      GET /dashboard/chamados-por-periodo?agrupamento=mes
+      
+[FALHOU] RF02 agrupamento inválido -> 400                          esperado 400, obtido 000
+      GET /dashboard/chamados-por-periodo?agrupamento=ano
+      
+[FALHOU] RF03 situação dos chamados                               esperado 200, obtido 000
+      GET /dashboard/situacao?dataInicio=2026-10-16&dataFim=2026-11-14
+      
+[FALHOU] RF04 tipos mais atendidos (top 5)                          esperado 200, obtido 000
+      GET /dashboard/tipos-mais-atendidos?limite=5
+      
+[FALHOU] RF04 limite fora da faixa -> 400                           esperado 400, obtido 000
+      GET /dashboard/tipos-mais-atendidos?limite=0
+      
+[FALHOU] Desempenho por técnico                                    esperado 200, obtido 000
+      GET /dashboard/desempenho-tecnicos
+      
+[FALHOU] RF05 filtro combinado status+prioridade                    esperado 200, obtido 000
+      GET /dashboard/indicadores?status=aberto,em_atendimento&prioridade=critica,alta
+      
+[FALHOU] RF05 status inválido -> 400                               esperado 400, obtido 000
+      GET /dashboard/indicadores?status=pendente
+      
+[FALHOU] Listar chamados paginado                                   esperado 200, obtido 000
+      GET /chamados?pagina=1&porPagina=5
+      
+[FALHOU] Listar apenas atrasados                                    esperado 200, obtido 000
+      GET /chamados?atrasados=true
+      
+[FALHOU] Ordenação inválida -> 400                               esperado 400, obtido 000
+      GET /chamados?ordenarPor=senha
+      
+[FALHOU] Chamado inexistente -> 404                                 esperado 404, obtido 000
+      GET /chamados/000000000000000000000000
+      
+[FALHOU] RF07 criar chamado                                         esperado 201, obtido 000
+      POST /chamados
+      
+[FALHOU] RF07 criar com campos inválidos -> 400                    esperado 400, obtido 000
+      POST /chamados
+      
+[FALHOU] RF07 JSON malformado -> 400                                esperado 400, obtido 000
+      POST /chamados
+      
+[FALHOU] RF07 transição inválida aberto->resolvido -> 409        esperado 409, obtido 000
+      PATCH /chamados//status
+      
+[FALHOU] RF07 iniciar atendimento sem técnico -> 400               esperado 400, obtido 000
+      PATCH /chamados//status
+      
+[FALHOU] RF07 iniciar atendimento                                   esperado 200, obtido 000
+      PATCH /chamados//status
+      
+[FALHOU] RF07 registrar consideração técnica                     esperado 201, obtido 000
+      POST /chamados//consideracoes
+      
+[FALHOU] RF07 resolver sem descrever solução -> 400               esperado 400, obtido 000
+      PATCH /chamados//status
+      
+[FALHOU] RF07 resolver chamado                                      esperado 200, obtido 000
+      PATCH /chamados//status
+      
+[FALHOU] Detalhe do chamado com histórico                          esperado 200, obtido 000
+      GET /chamados/
+      
+[FALHOU] Método não permitido -> 405                              esperado 405, obtido 000
+      DELETE /chamados/
+      
+-------------------------------------------------------------------------------
+Total: 29  |  Passaram: 0  |  Falharam: 29

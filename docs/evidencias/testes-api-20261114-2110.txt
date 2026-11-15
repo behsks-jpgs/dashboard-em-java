@@ -1,0 +1,91 @@
+Testes da API Thindesk - 14/11/2026 21:10 - http://localhost:8080/api/v1
+-------------------------------------------------------------------------------
+[PASSOU] Health check (API + banco)                                 esperado 200, obtido 200
+      GET /health
+      {"status":"UP","banco":"UP","totalChamados":1688,"horario":"2026-11-14T21:10:41"}
+[PASSOU] Opções de filtros                                        esperado 200, obtido 200
+      GET /filtros
+      {"status":[{"valor":"aberto","rotulo":"Aberto"},{"valor":"em_atendimento","rotulo":"Em atendimento"},{"valor":"aguardando","rotulo":"Aguardando usuário"},{"valor":"resolvido","rotulo":"Resolvido"},{"valor":"cancelado","
+[PASSOU] RF01 indicadores últimos 30 dias                          esperado 200, obtido 200
+      GET /dashboard/indicadores?dataInicio=2026-10-16&dataFim=2026-11-14
+      {"filtros":{"dataInicio":"2026-10-16","dataFim":"2026-11-14","status":[],"prioridade":[],"categoriaId":[],"tecnicoId":[]},"indicadores":{"total":100,"abertos":0,"emAtendimento":3,"aguardando":2,"resolvidos":89,"cancelado
+[PASSOU] RF01 data inválida -> 400                                 esperado 400, obtido 400
+      GET /dashboard/indicadores?dataInicio=2026-13-40
+      {"erro":{"codigo":"VALIDACAO","mensagem":"Parâmetros inválidos.","detalhes":[{"campo":"dataInicio","problema":"Data inválida. Use o formato AAAA-MM-DD."}]}}
+[PASSOU] RF01 período invertido -> 400                             esperado 400, obtido 400
+      GET /dashboard/indicadores?dataInicio=2026-11-14&dataFim=2026-10-16
+      {"erro":{"codigo":"VALIDACAO","mensagem":"Parâmetros inválidos.","detalhes":[{"campo":"dataInicio","problema":"dataInicio não pode ser posterior a dataFim."}]}}
+[PASSOU] RF02 série por dia                                        esperado 200, obtido 200
+      GET /dashboard/chamados-por-periodo?agrupamento=dia&dataInicio=2026-10-16&dataFim=2026-11-14
+      {"agrupamento":"dia","filtros":{"dataInicio":"2026-10-16","dataFim":"2026-11-14","status":[],"prioridade":[],"categoriaId":[],"tecnicoId":[]},"serie":[{"periodo":"2026-10-16","rotulo":"16/10","abertos":4,"resolvidos":2},
+[PASSOU] RF02 série por mês                                       esperado 200, obtido 200
+      GET /dashboard/chamados-por-periodo?agrupamento=mes
+      {"agrupamento":"mes","filtros":{"dataInicio":null,"dataFim":null,"status":[],"prioridade":[],"categoriaId":[],"tecnicoId":[]},"serie":[{"periodo":"2024-11","rotulo":"nov/24","abertos":28,"resolvidos":26},{"periodo":"2024
+[PASSOU] RF02 agrupamento inválido -> 400                          esperado 400, obtido 400
+      GET /dashboard/chamados-por-periodo?agrupamento=ano
+      {"erro":{"codigo":"VALIDACAO","mensagem":"Parâmetros inválidos.","detalhes":[{"campo":"agrupamento","problema":"Use um destes valores: dia, semana, mes."}]}}
+[PASSOU] RF03 situação dos chamados                               esperado 200, obtido 200
+      GET /dashboard/situacao?dataInicio=2026-10-16&dataFim=2026-11-14
+      {"filtros":{"dataInicio":"2026-10-16","dataFim":"2026-11-14","status":[],"prioridade":[],"categoriaId":[],"tecnicoId":[]},"total":100,"porStatus":[{"status":"aberto","rotulo":"Aberto","quantidade":0,"percentual":0.0},{"s
+[PASSOU] RF04 tipos mais atendidos (top 5)                          esperado 200, obtido 200
+      GET /dashboard/tipos-mais-atendidos?limite=5
+      {"filtros":{"dataInicio":null,"dataFim":null,"status":[],"prioridade":[],"categoriaId":[],"tecnicoId":[]},"limite":5,"ranking":[{"posicao":1,"categoriaId":"cat-acesso","categoria":"Acesso e Senhas","total":334,"atendidos
+[PASSOU] RF04 limite fora da faixa -> 400                           esperado 400, obtido 400
+      GET /dashboard/tipos-mais-atendidos?limite=0
+      {"erro":{"codigo":"VALIDACAO","mensagem":"Parâmetros inválidos.","detalhes":[{"campo":"limite","problema":"Deve estar entre 1 e 50."}]}}
+[PASSOU] Desempenho por técnico                                    esperado 200, obtido 200
+      GET /dashboard/desempenho-tecnicos
+      {"filtros":{"dataInicio":null,"dataFim":null,"status":[],"prioridade":[],"categoriaId":[],"tecnicoId":[]},"tecnicos":[{"tecnicoId":"tec-eduarda","nome":"Eduarda Lima","nivel":"N3","atendidos":281,"resolvidos":277,"penden
+[PASSOU] RF05 filtro combinado status+prioridade                    esperado 200, obtido 200
+      GET /dashboard/indicadores?status=aberto,em_atendimento&prioridade=critica,alta
+      {"filtros":{"dataInicio":null,"dataFim":null,"status":["aberto","em_atendimento"],"prioridade":["alta","critica"],"categoriaId":[],"tecnicoId":[]},"indicadores":{"total":4,"abertos":0,"emAtendimento":4,"aguardando":0,"re
+[PASSOU] RF05 status inválido -> 400                               esperado 400, obtido 400
+      GET /dashboard/indicadores?status=pendente
+      {"erro":{"codigo":"VALIDACAO","mensagem":"Parâmetros inválidos.","detalhes":[{"campo":"status","problema":"Valor(es) inválido(s): pendente. Permitidos: aberto, em_atendimento, aguardando, resolvido, cancelado."}]}}
+[PASSOU] Listar chamados paginado                                   esperado 200, obtido 200
+      GET /chamados?pagina=1&porPagina=5
+      {"dados":[{"id":"6af8f841b6bb892e387dd5b0","numero":1688,"titulo":"Teste automatizado","solicitante":"Script","setor":"TI","categoriaId":"cat-hardware","categoria":"Hardware","tecnicoId":"tec-carla","tecnico":"Carla Mend
+[PASSOU] Listar apenas atrasados                                    esperado 200, obtido 200
+      GET /chamados?atrasados=true
+      {"dados":[{"id":"6af8f6a0fbb12524a16ca832","numero":1686,"titulo":"Estoque divergente no sistema","solicitante":"João Pereira","setor":"Estamparia","categoriaId":"cat-erp","categoria":"Sistema ERP","tecnicoId":"tec-brun
+[PASSOU] Ordenação inválida -> 400                               esperado 400, obtido 400
+      GET /chamados?ordenarPor=senha
+      {"erro":{"codigo":"VALIDACAO","mensagem":"Parâmetros inválidos.","detalhes":[{"campo":"ordenarPor","problema":"Use um destes valores: dataAbertura, numero, prazoSla."}]}}
+[PASSOU] Chamado inexistente -> 404                                 esperado 404, obtido 404
+      GET /chamados/000000000000000000000000
+      {"erro":{"codigo":"NAO_ENCONTRADO","mensagem":"Chamado '000000000000000000000000' não encontrado.","detalhes":[]}}
+[PASSOU] RF07 criar chamado                                         esperado 201, obtido 201
+      POST /chamados
+      {"resumo":{"id":"6af8f88ab6bb892e387dd5b1","numero":1689,"titulo":"Teste automatizado","solicitante":"Script","setor":"TI","categoriaId":"cat-hardware","categoria":"Hardware","tecnicoId":null,"tecnico":null,"prioridade":
+[PASSOU] RF07 criar com campos inválidos -> 400                    esperado 400, obtido 400
+      POST /chamados
+      {"erro":{"codigo":"VALIDACAO","mensagem":"Parâmetros inválidos.","detalhes":[{"campo":"titulo","problema":"Campo obrigatório."},{"campo":"descricao","problema":"Campo obrigatório."},{"campo":"solicitante","problema":
+[PASSOU] RF07 JSON malformado -> 400                                esperado 400, obtido 400
+      POST /chamados
+      {"erro":{"codigo":"JSON_INVALIDO","mensagem":"Corpo da requisição ausente ou com JSON malformado.","detalhes":[]}}
+[PASSOU] RF07 transição inválida aberto->resolvido -> 409        esperado 409, obtido 409
+      PATCH /chamados/6af8f88ab6bb892e387dd5b1/status
+      {"erro":{"codigo":"TRANSICAO_INVALIDA","mensagem":"Não é permitido mudar de 'aberto' para 'resolvido'. Permitido: em_atendimento, cancelado.","detalhes":[]}}
+[PASSOU] RF07 iniciar atendimento sem técnico -> 400               esperado 400, obtido 400
+      PATCH /chamados/6af8f88ab6bb892e387dd5b1/status
+      {"erro":{"codigo":"VALIDACAO","mensagem":"Parâmetros inválidos.","detalhes":[{"campo":"tecnicoId","problema":"Informe o técnico que vai atender o chamado."}]}}
+[PASSOU] RF07 iniciar atendimento                                   esperado 200, obtido 200
+      PATCH /chamados/6af8f88ab6bb892e387dd5b1/status
+      {"resumo":{"id":"6af8f88ab6bb892e387dd5b1","numero":1689,"titulo":"Teste automatizado","solicitante":"Script","setor":"TI","categoriaId":"cat-hardware","categoria":"Hardware","tecnicoId":"tec-carla","tecnico":"Carla Mend
+[PASSOU] RF07 registrar consideração técnica                     esperado 201, obtido 201
+      POST /chamados/6af8f88ab6bb892e387dd5b1/consideracoes
+      {"resumo":{"id":"6af8f88ab6bb892e387dd5b1","numero":1689,"titulo":"Teste automatizado","solicitante":"Script","setor":"TI","categoriaId":"cat-hardware","categoria":"Hardware","tecnicoId":"tec-carla","tecnico":"Carla Mend
+[PASSOU] RF07 resolver sem descrever solução -> 400               esperado 400, obtido 400
+      PATCH /chamados/6af8f88ab6bb892e387dd5b1/status
+      {"erro":{"codigo":"VALIDACAO","mensagem":"Parâmetros inválidos.","detalhes":[{"campo":"observacao","problema":"Descreva a solução aplicada."}]}}
+[PASSOU] RF07 resolver chamado                                      esperado 200, obtido 200
+      PATCH /chamados/6af8f88ab6bb892e387dd5b1/status
+      {"resumo":{"id":"6af8f88ab6bb892e387dd5b1","numero":1689,"titulo":"Teste automatizado","solicitante":"Script","setor":"TI","categoriaId":"cat-hardware","categoria":"Hardware","tecnicoId":"tec-carla","tecnico":"Carla Mend
+[PASSOU] Detalhe do chamado com histórico                          esperado 200, obtido 200
+      GET /chamados/6af8f88ab6bb892e387dd5b1
+      {"resumo":{"id":"6af8f88ab6bb892e387dd5b1","numero":1689,"titulo":"Teste automatizado","solicitante":"Script","setor":"TI","categoriaId":"cat-hardware","categoria":"Hardware","tecnicoId":"tec-carla","tecnico":"Carla Mend
+[PASSOU] Método não permitido -> 405                              esperado 405, obtido 405
+      DELETE /chamados/6af8f88ab6bb892e387dd5b1
+      {"erro":{"codigo":"METODO_NAO_PERMITIDO","mensagem":"Método DELETE não permitido nesta rota.","detalhes":[]}}
+-------------------------------------------------------------------------------
+Total: 29  |  Passaram: 29  |  Falharam: 0

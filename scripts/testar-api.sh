@@ -52,7 +52,7 @@ teste "RF07 JSON malformado -> 400"                          400 POST "/chamados
 teste "RF07 transição inválida aberto->resolvido -> 409"     409 PATCH "/chamados/$ID/status" '{"status":"resolvido","observacao":"x"}'
 teste "RF07 iniciar atendimento sem técnico -> 400"          400 PATCH "/chamados/$ID/status" '{"status":"em_atendimento"}'
 teste "RF07 iniciar atendimento"                             200 PATCH "/chamados/$ID/status" '{"status":"em_atendimento","tecnicoId":"tec-carla"}'
-teste "RF07 registrar consideração técnica"                  201 POST "/chamados/$ID/consideracoes" '{"tipo":"diagnostico","texto":"Teste de diagnóstico"}'
+teste "RF07 registrar consideração técnica"                  201 POST "/chamados/$ID/consideracoes" '{"tipo":"diagnostico","texto":"Teste de diagnostico"}'
 teste "RF07 resolver sem descrever solução -> 400"           400 PATCH "/chamados/$ID/status" '{"status":"resolvido"}'
 teste "RF07 resolver chamado"                                200 PATCH "/chamados/$ID/status" '{"status":"resolvido","observacao":"Resolvido pelo script"}'
 teste "Detalhe do chamado com histórico"                     200 GET  "/chamados/$ID"
